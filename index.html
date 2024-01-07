@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<style>
+
+canvas {
+
+ border: 1px solid black;
+
+}
+
+h1 {
+
+ text-align: center;
+
+ margin-bottom: 50px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<h1>Simple Paint App</h1>
+
+
+
+<canvas id="myCanvas" style="position:absolute;top:0;left:0;">
+
+</canvas>
+
+
+
+<button id="resetButton" style="position:absolute;top:90%;left:50%;transform:translate(-50%, -50%);">Reset</button>
+
+
+
+<script>
+
+var canvas = document.getElementById('myCanvas');
+
+var ctx = canvas.getContext('2d');
+
+var paint = false;
+
+var lastX;
+
+var lastY;
+
+var circles = [];
+
+
+
+function resizeCanvas() {
+
+ canvas.width = window.innerWidth;
+
+ canvas.height = window.innerHeight;
+
+}
+
+
+
+function drawCircle(x, y, radius, color) {
+
+ ctx.beginPath();
+
+ ctx.fillStyle = color;
+
+ ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+ ctx.fill();
+
+ ctx.closePath();
+
+}
+
+
+
+function draw(e) {
+
+ if (!paint) return;
+
+ var found = false;
+
+ var index;
+
+
+
+ for (var i = 0; i < circles.length; i++) {
+
+   var circle = circles[i];
+
+   var dx = e.clientX - circle.x;
+
+   var dy = e.clientY - circle.y;
+
+   var distance = Math.sqrt(dx * dx + dy * dy);
+
+
+
+   if (distance <= circle.radius) {
+
+     found = true;
+
+     index = i;
+
+     break;
+
+   }
+
+ }
+
+
+
+ if (found) {
+
+   alert('Hit');
+
+   if (e.detail === 2) {
+
+     ctx.clearRect(circles[index].x - circles[index].radius, circles[index].y - circles[index].radius, 2 * circles[index].radius, 2 * circles[index].radius);
+
+     circles.splice(index, 1);
+
+   }
+
+ } else {
+
+   alert('Miss');
+
+   var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+   var radius = 25;
+
+   var x = e.clientX;
+
+   var y = e.clientY;
+
+   drawCircle(x, y, radius, color);
+
+   circles.push({ x: x, y: y, radius: radius, color: color });
+
+ }
+
+}
+
+
+
+canvas.addEventListener('mousedown', function(e) {
+
+ paint = true;
+
+ draw(e);
+
+});
+
+
+
+canvas.addEventListener('mouseup', function() {
+
+ paint = false;
+
+});
+
+
+
+canvas.addEventListener('mouseleave', function() {
+
+ paint = false;
+
+});
+
+
+
+document.getElementById('resetButton').addEventListener('click', function() {
+
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+ circles = [];
+
+});
+
+
+
+// Set the initial size of the canvas
+
+resizeCanvas();
+
+
+
+// Listen for window resize events
+
+window.addEventListener('resize', resizeCanvas);
+
+  </script> </body> </html>
